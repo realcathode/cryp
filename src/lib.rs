@@ -11,6 +11,10 @@ fn validate_hex(hexstr: &String) -> Result<(), Box<dyn Error>> {
 }
 
 pub fn hex_to_base64(hexstr: String) -> Result<String, Box<dyn Error>> {
+    // Always operate on raw bytes, 
+    // never on encoded strings. 
+    // Only use hex and base64 for pretty-printing.
+
     if let Err(e) = validate_hex(&hexstr) {
         return Err(e);
     }
