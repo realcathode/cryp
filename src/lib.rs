@@ -3,9 +3,16 @@ use std::error::Error;
 const CHARSET: &[u8; 64] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 const PADDING: char = '=';
 
-pub fn hex_to_base64(hexstr: String) -> Result<String, Box<dyn Error>> {
-    if !hexstr.len() % 2 == 0 {
+fn validate_hex(hexstr: &String) -> Result<(), Box<dyn Error>> {
+    if hexstr.len() % 2 != 0 {
         return Err("not a valid hex encoded string".into());
+    }
+    Ok(())
+}
+
+pub fn hex_to_base64(hexstr: String) -> Result<String, Box<dyn Error>> {
+    if let Err(e) = validate_hex(&hexstr) {
+        return Err(e);
     }
 
     let mut bytes: Vec<u8> = Vec::new();    
@@ -14,7 +21,6 @@ pub fn hex_to_base64(hexstr: String) -> Result<String, Box<dyn Error>> {
         let byte = u8::from_str_radix(&hexstr[i..][..2], 16).unwrap();
         bytes.push(byte);
     }
-
     Ok(base64_encode(&bytes))
 }
 
