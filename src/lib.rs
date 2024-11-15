@@ -15,6 +15,41 @@ fn collect_six_bits(from: (u8, u8), offset: u8) -> u8 {
     ((combined & (0b1111110000000000u16 >> offset)) >> (10 - offset)) as u8
 }
 
+/// Converts a hexadecimal string into a vector of bytes (`Vec<u8>`).
+///
+/// This function takes a string slice containing a hexadecimal representation of data
+/// and converts it into its corresponding byte values. The input string must have
+/// an even number of characters and consist only of valid hexadecimal digits (`0-9`, `a-f`, `A-F`).
+///
+/// # Arguments
+///
+/// * `hexstr` - A string slice (`&str`) containing the hexadecimal data to be converted.
+///
+/// # Returns
+///
+/// A `Result` containing:
+/// - `Ok(Vec<u8>)` if the conversion succeeds, with the vector representing the bytes.
+/// - `Err(Box<dyn Error>)` if the input string is invalid (e.g., not a valid hexadecimal string or of incorrect length).
+///
+/// # Errors
+///
+/// This function returns an error in the following cases:
+/// - If the input string is not a valid hexadecimal string.
+/// - If the string length is odd (since each byte requires two hexadecimal characters).
+///
+/// # Examples
+///
+/// ```
+/// let hexstr = "48656c6c6f"; // Hexadecimal for "Hello"
+/// let bytes = hexstr_to_bytes(hexstr).unwrap();
+/// assert_eq!(bytes, vec![72, 101, 108, 108, 111]);
+/// ```
+///
+/// ```
+/// let invalid_hexstr = "48656g"; // Invalid hex character 'g'
+/// let result = hexstr_to_bytes(invalid_hexstr);
+/// assert!(result.is_err());
+/// ```
 pub fn hexstr_to_bytes(hexstr: &str) -> Result<Vec<u8>, Box<dyn Error>> {
     if let Err(e) = validate_hexstr(&hexstr) {
         return Err(e);
@@ -30,7 +65,26 @@ pub fn hexstr_to_bytes(hexstr: &str) -> Result<Vec<u8>, Box<dyn Error>> {
     Ok(bytes)
 }
 
-
+/// Encodes the given data as a Base64-encoded string.
+///
+/// This function takes a vector of bytes (`Vec<u8>`) as input and converts it
+/// into a Base64-encoded string. 
+///
+/// # Arguments
+/// 
+/// * `data` - A vector of bytes (`Vec<u8>`) that represents the binary data to be encoded.
+///
+/// # Returns
+/// 
+/// A `String` containing the Base64-encoded representation of the input data.
+///
+/// # Examples
+/// 
+/// ```
+/// let data = vec![72, 101, 108, 108, 111]; // Represents "Hello" in ASCII
+/// let encoded = base64_encode(data);
+/// assert_eq!(encoded, "SGVsbG8=");
+/// ```
 pub fn base64_encode(data: &[u8]) -> String {
     let mut bits_encoded = 0usize;
     let mut encoded_string = String::new();
@@ -57,6 +111,34 @@ pub fn base64_encode(data: &[u8]) -> String {
     encoded_string
 }
 
+/// Converts a slice of bytes (`&[u8]`) into a hexadecimal string.
+///
+/// This function takes a byte slice and converts each byte into a
+/// two-character hexadecimal representation. The resulting string will
+/// contain the hexadecimal values of the input bytes, concatenated without
+/// any separators.
+///
+/// # Arguments
+///
+/// * `data` - A slice of bytes (`&[u8]`) to be converted into a hexadecimal string.
+///
+/// # Returns
+///
+/// A `String` containing the hexadecimal representation of the input bytes.
+///
+/// # Examples
+///
+/// ```
+/// let bytes = &[72, 101, 108, 108, 111]; // Represents "Hello" in bytes
+/// let hex_str = bytes_to_hexstr(bytes);
+/// assert_eq!(hex_str, "48656c6c6f");
+/// ```
+///
+/// ```
+/// let empty_bytes = &[]; // Empty input
+/// let hex_str = bytes_to_hexstr(empty_bytes);
+/// assert_eq!(hex_str, "");
+/// ```
 pub fn bytes_to_hexstr(data: &[u8]) -> String {
     let mut hexstr = String::with_capacity(data.len() * 2); // Preallocate space
     for byte in data {
