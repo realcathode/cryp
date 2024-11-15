@@ -1,18 +1,17 @@
+This is a personal Rust library to assist in solving the Cryptopals Crypto Challenges. It includes utilities for format conversions, cryptographic algorithm implementations, and solving challenges related to cryptography. The project aims to deepen my understanding of cryptography while learning Rust.
 
-
-This is a personal Rust library created to help me solve the Cryptopals Crypto Challenges. The library includes functions to solve various challenges related to cryptography, including converting between different formats, implementing cryptographic algorithms, and solving attacks on real-world crypto systems. The goal is to deepen my understanding of cryptographic concepts and how they can be attacked or exploited.
-
-
-The library contains functions designed to solve specific Cryptopals challenges. Here's a simple example demonstrating how to use the hex_to_base64 function for the first challenge in the first set.
-
+Example usage:
 ```Rust
-use cryp;
+use cryp::{hexstr_to_bytes, bytes_to_hexstr};
 
 fn main() {
-    let s = String::from("49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d");
+    let s = "We started dancing and love put us into a groove";
+    println!("String literal: \"{s}\"\n");
 
-    if let Ok(a) = cryp::hex_to_base64(&s) {
-        println!("HEX: {}\nBASE64: {}", s, a);
-    }
+    let hex = bytes_to_hexstr(s.as_bytes());
+    println!("bytes to hex encoded str: {}", hex);
+
+    let bytes = hexstr_to_bytes(&hex).unwrap();
+    println!("vector of bytes: {:?}", bytes);
 }
 ```
