@@ -17,7 +17,7 @@ fn main() {
 ```
 
 - [x] Convert hex to base64
-- [ ] Fixed XOR
+- [x] Fixed XOR
 - [ ] Single-byte XOR cipher
 - [ ] Detect single-character XOR
 - [ ] Implement repeating-key XOR
