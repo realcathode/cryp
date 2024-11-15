@@ -1,21 +1,22 @@
 use std::error::Error;
-
+use std::fmt::Write;
 const CHARSET: &[u8; 64] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 const PADDING: char = '=';
 
-fn validate_hex(hexstr: &String) -> Result<(), Box<dyn Error>> {
+fn validate_hexstr(hexstr: &str) -> Result<(), Box<dyn Error>> {
     if hexstr.len() % 2 != 0 {
-        return Err("not a valid hex encoded string".into());
+        return Err("hex not valid: odd length".into());
     }
     Ok(())
 }
 
-pub fn hex_to_base64(hexstr: &String) -> Result<String, Box<dyn Error>> {
-    // Always operate on raw bytes, 
-    // never on encoded strings. 
-    // Only use hex and base64 for pretty-printing.
+fn collect_six_bits(from: (u8, u8), offset: u8) -> u8 {
+    let combined: u16 = ((from.0 as u16) << 8) | (from.1 as u16);
+    ((combined & (0b1111110000000000u16 >> offset)) >> (10 - offset)) as u8
+}
 
-    if let Err(e) = validate_hex(&hexstr) {
+pub fn hexstr_to_bytes(hexstr: &str) -> Result<Vec<u8>, Box<dyn Error>> {
+    if let Err(e) = validate_hexstr(&hexstr) {
         return Err(e);
     }
 
@@ -25,8 +26,10 @@ pub fn hex_to_base64(hexstr: &String) -> Result<String, Box<dyn Error>> {
         let byte = u8::from_str_radix(&hexstr[i..][..2], 16).unwrap();
         bytes.push(byte);
     }
-    Ok(base64_encode(&bytes))
+
+    Ok(bytes)
 }
+
 
 pub fn base64_encode(data: &[u8]) -> String {
     let mut bits_encoded = 0usize;
@@ -54,7 +57,11 @@ pub fn base64_encode(data: &[u8]) -> String {
     encoded_string
 }
 
-fn collect_six_bits(from: (u8, u8), offset: u8) -> u8 {
-    let combined: u16 = ((from.0 as u16) << 8) | (from.1 as u16);
-    ((combined & (0b1111110000000000u16 >> offset)) >> (10 - offset)) as u8
+pub fn bytes_to_hexstr(data: &[u8]) -> String {
+    let mut hexstr = String::with_capacity(data.len() * 2); // Preallocate space
+    for byte in data {
+        write!(&mut hexstr, "{:02x}", byte).unwrap();
+    }
+
+    hexstr
 }
