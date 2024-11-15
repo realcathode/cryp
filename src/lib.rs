@@ -147,3 +147,45 @@ pub fn bytes_to_hexstr(data: &[u8]) -> String {
 
     hexstr
 }
+
+/// Performs a fixed-length XOR operation between two byte slices.
+///
+/// This function takes two slices of bytes (`data` and `key`), and performs an XOR operation 
+/// on each corresponding pair of bytes. The lengths of both slices must be equal, and the result 
+/// will be a new `Vec<u8>` containing the XORed values of the two input slices.
+///
+/// # Arguments
+///
+/// * `data` - A slice of bytes (`&[u8]`) that will be XORed with the `key`.
+/// * `key` - A slice of bytes (`&[u8]`) that will be XORed with the `data`. It must have the same length as `data`.
+///
+/// # Returns
+///
+/// A `Result<Vec<u8>, Box<dyn Error>>`. On success, it returns a `Vec<u8>` containing the XORed bytes.
+/// If the input slices have different lengths, it returns an error with a message describing the issue.
+///
+/// # Errors
+///
+/// This function returns an error if the input slices (`data` and `key`) have different lengths.
+///
+/// # Examples
+///
+/// ```
+/// let data = vec![0x1c, 0x01, 0x11, 0x00];
+/// let key = vec![0x1f, 0x01, 0x01, 0x00];
+/// let result = fixed_xor(&data, &key);
+/// assert_eq!(result.unwrap(), vec![0x05, 0x00, 0x10, 0x00]);
+/// ```
+///
+pub fn fixed_xor(data: &[u8], key: &[u8]) -> Result<Vec<u8>, Box<dyn Error>> {
+    if data.len() != key.len() {
+        return Err("inputs (data and key) should have equal length".into());        
+    }
+
+    let mut xored: Vec<u8> = vec![];
+    for (&a, &b) in data.iter().zip(key.iter()) {
+        xored.push(a ^ b);
+    }
+
+   Ok(xored)
+}
