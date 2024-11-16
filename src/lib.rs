@@ -176,7 +176,6 @@ pub fn bytes_to_hexstr(data: &[u8]) -> String {
 /// let result = fixed_xor(&data, &key);
 /// assert_eq!(result.unwrap(), vec![0x05, 0x00, 0x10, 0x00]);
 /// ```
-///
 pub fn fixed_xor(data: &[u8], key: &[u8]) -> Result<Vec<u8>, Box<dyn Error>> {
     if data.len() != key.len() {
         return Err("inputs (data and key) should have equal length".into());        
@@ -188,4 +187,65 @@ pub fn fixed_xor(data: &[u8], key: &[u8]) -> Result<Vec<u8>, Box<dyn Error>> {
     }
 
    Ok(xored)
+}
+
+/// Applies a one-byte XOR operation to a slice of bytes.
+///
+/// This function takes a slice of bytes and a single byte key and XORs 
+/// each byte in the slice with the key. The result is returned as a 
+/// new vector of bytes.
+///
+/// # Arguments
+///
+/// * `data` - A slice of bytes (`&[u8]`) that will be XORed.
+/// * `key` - A single byte (`u8`) used as the XOR key.
+///
+/// # Returns
+///
+/// A `Vec<u8>` containing the XORed bytes.
+///
+/// # Examples
+///
+/// ```
+/// let data = b"Hello";
+/// let key = 42; // Example key
+/// let result = one_byte_xor(data, key);
+/// ```
+pub fn one_byte_xor(data: &[u8], key: u8) -> Vec<u8> {
+    let mut xored: Vec<u8> = vec![];
+    for &a in data.iter() {
+        xored.push(a ^ key);
+    }
+    
+    xored
+}
+
+/// Scores the text based on the proportion of alphanumeric and space characters.
+///
+/// This function calculates a score for the input data by determining the percentage
+/// of characters that are ASCII alphanumeric or spaces. The score is returned as a
+/// floating-point value.
+///
+/// # Arguments
+///
+/// * `data` - A byte slice (`&[u8]`) representing the input data.
+///
+/// # Returns
+///
+/// A `f32` representing the percentage of valid ASCII alphanumeric and space characters.
+///
+/// # Examples
+///
+/// ```
+/// let data = b"Hello, world!";
+/// let score = score_text(data);
+/// assert!(score > 50.0);
+/// ```
+pub fn score_text(data: &[u8]) -> f32 {
+    let valid = data
+        .iter()
+        .filter(|&&byte| (byte as char).is_ascii_alphanumeric() || byte == b' ')
+        .count();
+
+    (100.0 * valid as f32) / data.len() as f32
 }
