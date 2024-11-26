@@ -1,5 +1,6 @@
 use std::error::Error;
 use std::fmt::Write;
+use std::collections::HashMap;
 const CHARSET: &[u8; 64] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 const PADDING: char = '=';
 
@@ -248,4 +249,16 @@ pub fn score_text(data: &[u8]) -> f32 {
         .count();
 
     (100.0 * valid as f32) / data.len() as f32
+}
+
+pub fn character_frequency(data: &[u8]) -> HashMap<char, usize> {
+    let mut freq = HashMap::new();
+
+    for &byte in data {
+        if byte.to_ascii_lowercase().is_ascii_alphabetic() {
+            let ch = byte.to_ascii_lowercase() as char;
+            *freq.entry(ch).or_insert(0) += 1;
+        }
+    }
+    freq
 }
