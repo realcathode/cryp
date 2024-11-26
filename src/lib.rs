@@ -251,6 +251,42 @@ pub fn score_text(data: &[u8]) -> f32 {
     (100.0 * valid as f32) / data.len() as f32
 }
 
+/// Computes the frequency of ASCII alphabetic characters in a byte slice.
+///
+/// # Arguments
+///
+/// * `data` - A slice of bytes (`&[u8]`) to analyze for character frequencies.
+///
+/// # Returns
+///
+/// A `HashMap` where the keys are ASCII alphabetic characters (`char`) 
+/// and the values are their respective frequencies (`usize`) in the input slice.
+///
+/// # Behavior
+///
+/// - Only ASCII alphabetic characters (`A-Z` and `a-z`) are counted.
+/// - Characters are converted to lowercase before counting to ensure case insensitivity.
+/// - Non-alphabetic characters (e.g., digits, punctuation) are ignored.
+///
+/// # Example
+///
+/// ```
+/// use std::collections::HashMap;
+///
+/// let data = b"Hello, World!";
+/// let result = character_frequency(data);
+///
+/// let mut expected = HashMap::new();
+/// expected.insert('h', 1);
+/// expected.insert('e', 1);
+/// expected.insert('l', 3);
+/// expected.insert('o', 2);
+/// expected.insert('w', 1);
+/// expected.insert('r', 1);
+/// expected.insert('d', 1);
+///
+/// assert_eq!(result, expected);
+/// ```
 pub fn character_frequency(data: &[u8]) -> HashMap<char, usize> {
     let mut freq = HashMap::new();
 
