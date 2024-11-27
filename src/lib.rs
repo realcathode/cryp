@@ -174,10 +174,10 @@ pub fn bytes_to_hexstr(data: &[u8]) -> String {
 /// ```
 /// let data = vec![0x1c, 0x01, 0x11, 0x00];
 /// let key = vec![0x1f, 0x01, 0x01, 0x00];
-/// let result = fixed_xor(&data, &key);
+/// let result = xor_fixed(&data, &key);
 /// assert_eq!(result.unwrap(), vec![0x05, 0x00, 0x10, 0x00]);
 /// ```
-pub fn fixed_xor(data: &[u8], key: &[u8]) -> Result<Vec<u8>, Box<dyn Error>> {
+pub fn xor_fixed(data: &[u8], key: &[u8]) -> Result<Vec<u8>, Box<dyn Error>> {
     if data.len() != key.len() {
         return Err("inputs (data and key) should have equal length".into());        
     }
@@ -210,9 +210,9 @@ pub fn fixed_xor(data: &[u8], key: &[u8]) -> Result<Vec<u8>, Box<dyn Error>> {
 /// ```
 /// let data = b"Hello";
 /// let key = 42; // Example key
-/// let result = one_byte_xor(data, key);
+/// let result = xor_one_byte(data, key);
 /// ```
-pub fn one_byte_xor(data: &[u8], key: u8) -> Vec<u8> {
+pub fn xor_one_byte(data: &[u8], key: u8) -> Vec<u8> {
     let mut xored: Vec<u8> = vec![];
     for &a in data.iter() {
         xored.push(a ^ key);
@@ -239,7 +239,7 @@ pub fn one_byte_xor(data: &[u8], key: u8) -> Vec<u8> {
 /// is the XOR of the corresponding byte in the data and the key. The result will have the same
 /// length as the input data.
 ///
-pub fn repeating_xor(data: &[u8], key: &[u8]) -> Vec<u8> {
+pub fn xor_repeating(data: &[u8], key: &[u8]) -> Vec<u8> {
     let mut xored: Vec<u8> = vec![];
     for (i, &byte) in data.iter().enumerate() {
         xored.push(byte ^ key[i % key.len()]);
