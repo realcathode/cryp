@@ -221,12 +221,30 @@ pub fn one_byte_xor(data: &[u8], key: u8) -> Vec<u8> {
     xored
 }
 
+/// Performs a repeating XOR operation on the given data using the provided key.
+/// 
+/// The key is applied cyclically to the data. If the key is shorter than the data,
+/// it is repeated in a loop to match the length of the data. Each byte of the data is
+/// XORed with the corresponding byte of the key, using the modulus of the key length
+/// to repeat the key as necessary.
+///
+/// # Arguments
+/// 
+/// * `data` - A byte slice (`&[u8]`) representing the data to be XORed.
+/// * `key` - A byte slice (`&[u8]`) representing the key used for the XOR operation.
+/// 
+/// # Returns
+/// 
+/// A `Vec<u8>` containing the result of the XOR operation, where each byte in the result
+/// is the XOR of the corresponding byte in the data and the key. The result will have the same
+/// length as the input data.
+///
 pub fn repeating_xor(data: &[u8], key: &[u8]) -> Vec<u8> {
     let mut xored: Vec<u8> = vec![];
     for (i, &byte) in data.iter().enumerate() {
         xored.push(byte ^ key[i % key.len()]);
     }
-    
+
     xored
 }
 
