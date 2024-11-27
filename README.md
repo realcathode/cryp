@@ -6,7 +6,7 @@ use cryp::{hexstr_to_bytes, bytes_to_hexstr};
 
 fn main() {
     let s = "We started dancing and love put us into a groove";
-    println!("String literal: \"{s}\"\n");
+    println!("String literal: \"{}\"\n", s);
 
     let hex = bytes_to_hexstr(s.as_bytes());
     println!("bytes to hex encoded str: {}", hex);
@@ -20,7 +20,7 @@ fn main() {
 - [x] Fixed XOR
 - [x] Single-byte XOR cipher
 - [x] Detect single-character XOR
-- [ ] Implement repeating-key XOR
+- [x] Implement repeating-key XOR
 - [ ] Break repeating-key XOR
 - [ ] AES in ECB mode
 - [ ] Detect AES in ECB mode
