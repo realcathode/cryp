@@ -221,6 +221,15 @@ pub fn one_byte_xor(data: &[u8], key: u8) -> Vec<u8> {
     xored
 }
 
+pub fn repeating_xor(data: &[u8], key: &[u8]) -> Vec<u8> {
+    let mut xored: Vec<u8> = vec![];
+    for (i, &byte) in data.iter().enumerate() {
+        xored.push(byte ^ key[i % key.len()]);
+    }
+    
+    xored
+}
+
 /// Scores the text based on the proportion of alphanumeric and space characters.
 ///
 /// This function calculates a score for the input data by determining the percentage
