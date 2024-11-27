@@ -251,6 +251,28 @@ pub fn score_text(data: &[u8]) -> f32 {
     (100.0 * valid as f32) / data.len() as f32
 }
 
+fn analyze_string(s: &str) -> (f64, f64, f64) {
+    let total_chars = s.len() as f64;
+    let letters = s.chars().filter(|c| c.is_ascii_alphabetic()).count() as f64;
+    let spaces = s.chars().filter(|c| c.is_whitespace()).count() as f64;
+    let symbols = total_chars - letters - spaces;
+
+    let letter_ratio = letters / total_chars;
+    let space_ratio = spaces / total_chars;
+    let symbol_ratio = symbols / total_chars;
+
+    (letter_ratio, space_ratio, symbol_ratio)
+}
+
+pub fn is_valid_text(s: &[u8]) -> bool {
+    let s = String::from_utf8_lossy(&s);
+    let (letter_ratio, space_ratio, symbol_ratio) = analyze_string(&s);
+
+    letter_ratio >= 0.7 &&
+    space_ratio <= 0.2 &&
+    symbol_ratio <= 0.1
+}
+
 /// Computes the frequency of ASCII alphabetic characters in a byte slice.
 ///
 /// # Arguments
@@ -298,3 +320,4 @@ pub fn character_frequency(data: &[u8]) -> HashMap<char, usize> {
     }
     freq
 }
+
