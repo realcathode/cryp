@@ -251,6 +251,17 @@ pub fn score_text(data: &[u8]) -> f32 {
     (100.0 * valid as f32) / data.len() as f32
 }
 
+/// Analyzes a given string and calculates the ratios of letters, spaces, and symbols.
+///
+/// # Parameters
+/// - `s`: A string slice (`&str`) representing the input text to analyze.
+///
+/// # Returns
+/// A tuple `(f64, f64, f64)` containing:
+/// - `letter_ratio`: The proportion of alphabetic characters in the string.
+/// - `space_ratio`: The proportion of whitespace characters in the string.
+/// - `symbol_ratio`: The proportion of non-alphabetic and non-whitespace characters.
+///
 fn analyze_string(s: &str) -> (f64, f64, f64) {
     let total_chars = s.len() as f64;
     let letters = s.chars().filter(|c| c.is_ascii_alphabetic()).count() as f64;
@@ -264,6 +275,26 @@ fn analyze_string(s: &str) -> (f64, f64, f64) {
     (letter_ratio, space_ratio, symbol_ratio)
 }
 
+/// Validates whether a given byte slice (`&[u8]`) represents valid English-like text.
+///
+/// # Parameters
+/// - `s`: A byte slice (`&[u8]`) containing the input data to validate.
+///
+/// # Returns
+/// - `true` if the input satisfies the following conditions:
+///   - Letters make up at least 70% of the total characters.
+///   - Spaces make up at most 20% of the total characters.
+///   - Symbols make up at most 10% of the total characters.
+/// - `false` otherwise.
+///
+/// # Behavior
+/// - Invalid UTF-8 sequences are replaced with the `�` character (`U+FFFD`) by using
+///   `String::from_utf8_lossy`. 
+/// 
+/// # TODO
+/// - Exclude the replacement character (`�`) from the analysis if this behavior
+///   is not desired in the future.
+///
 pub fn is_valid_text(s: &[u8]) -> bool {
     let s = String::from_utf8_lossy(&s);
     let (letter_ratio, space_ratio, symbol_ratio) = analyze_string(&s);
