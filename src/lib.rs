@@ -379,3 +379,16 @@ pub fn character_frequency(data: &[u8]) -> HashMap<char, usize> {
     freq
 }
 
+fn print_type<T>(_: &T) {
+    println!("{}", std::any::type_name::<T>());
+}
+
+pub fn hamming_distance_bit(s1: &str, s2: &str) -> u32 {
+    s1.bytes().zip(s2.bytes())
+        .map(|(b1, b2)| (b1 ^ b2).count_ones()).sum()
+}
+
+pub fn hamming_distance_char(s1: &str, s2: &str) -> u32 {
+    s1.chars().zip(s2.chars())
+        .filter(|(c1, c2)| c1 != c2).count() as u32
+}
