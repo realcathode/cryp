@@ -379,15 +379,71 @@ pub fn character_frequency(data: &[u8]) -> HashMap<char, usize> {
     freq
 }
 
-fn print_type<T>(_: &T) {
+/// Prints the type of the given value.
+///
+/// This function takes a reference to a value and prints its type
+/// using Rust's `type_name` functionality.
+///
+/// # Type Parameters
+/// - `T`: The type of the value.
+///
+/// # Arguments
+/// - `_`: A reference to a value of any type.
+///
+/// # Example
+/// ```rust
+/// let x = 42;
+/// print_type(&x); // Outputs: i32
+/// ```
+pub fn print_type<T>(_: &T) {
     println!("{}", std::any::type_name::<T>());
 }
 
+/// Calculates the Hamming distance between two strings at the bit level.
+///
+/// The Hamming distance is the number of differing bits when the corresponding
+/// bytes of the two strings are XORed. This function assumes both strings are of the
+/// same length; differing lengths will lead to truncated comparison.
+///
+/// # Arguments
+/// - `s1`: The first input string.
+/// - `s2`: The second input string.
+///
+/// # Returns
+/// - A `u32` value representing the total number of differing bits.
+///
+/// # Example
+/// ```rust
+/// let s1 = "hello";
+/// let s2 = "h3llo";
+/// let distance = hamming_distance_bit(s1, s2);
+/// println!("Bit-level Hamming distance: {}", distance); // Outputs: 4
+/// ```
 pub fn hamming_distance_bit(s1: &str, s2: &str) -> u32 {
     s1.bytes().zip(s2.bytes())
         .map(|(b1, b2)| (b1 ^ b2).count_ones()).sum()
 }
 
+/// Calculates the Hamming distance between two strings at the character level.
+///
+/// The Hamming distance is defined as the number of positions where
+/// the characters in the two strings differ. This function assumes both strings are of the
+/// same length; differing lengths will lead to truncated comparison.
+///
+/// # Arguments
+/// - `s1`: The first input string.
+/// - `s2`: The second input string.
+///
+/// # Returns
+/// - A `u32` value representing the number of differing characters.
+///
+/// # Example
+/// ```rust
+/// let s1 = "hello";
+/// let s2 = "h3llo";
+/// let distance = hamming_distance_char(s1, s2);
+/// println!("Character-level Hamming distance: {}", distance); // Outputs: 1
+/// ```
 pub fn hamming_distance_char(s1: &str, s2: &str) -> u32 {
     s1.chars().zip(s2.chars())
         .filter(|(c1, c2)| c1 != c2).count() as u32
