@@ -1,6 +1,10 @@
 use std::error::Error;
 use std::fmt::Write;
 use std::collections::HashMap;
+use std::cmp::Ordering;
+use std::collections::BinaryHeap;
+
+
 const CHARSET: &[u8; 64] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 const PADDING: char = '=';
 
@@ -474,7 +478,7 @@ pub fn hamming_distance_bit(s1: &[u8], s2: &[u8]) -> u32 {
 /// - `s2`: The second input string.
 ///
 /// # Returns
-/// - A `u32` value representing the number of differing characters.
+/// - A `usize` value representing the number of differing characters.
 ///
 /// # Example
 /// ```rust
@@ -483,7 +487,56 @@ pub fn hamming_distance_bit(s1: &[u8], s2: &[u8]) -> u32 {
 /// let distance = hamming_distance_char(s1, s2);
 /// println!("Character-level Hamming distance: {}", distance); // Outputs: 1
 /// ```
-pub fn hamming_distance_char(s1: &str, s2: &str) -> u32 {
+pub fn hamming_distance_char(s1: &str, s2: &str) -> usize {
     s1.chars().zip(s2.chars())
-        .filter(|(c1, c2)| c1 != c2).count() as u32
+        .filter(|(c1, c2)| c1 != c2).count() as usize
+}
+
+pub fn xor_guess_key_len(data: &[u8], min_guess: usize, max_guess: usize) -> usize {
+    let mut scores: Vec<(f64, usize)> = Vec::new();
+
+    for key_size in min_guess..=max_guess {
+        let mut total_distance = 0.0;
+        let mut count = 0;
+
+        for chunk in data.chunks(key_size * 2) {
+            if chunk.len() < key_size * 2 {
+                break;
+            }
+            let a = &chunk[..key_size];
+            let b = &chunk[key_size..key_size * 2];
+            total_distance += hamming_distance_bit(a, b) as f64 / key_size as f64;
+            count += 1;
+        }
+
+        if count > 0 {
+            scores.push((total_distance / count as f64, key_size));
+        }
+    }
+
+    scores.sort_by(|a, b| a.partial_cmp(b).unwrap_or(Ordering::Equal));
+    scores[0].1
+}
+
+pub fn xor_guess_key(data: &[u8], key_size: usize) -> Vec<u8> {
+    let mut key = Vec::new();
+
+    for i in 0..key_size {
+        let mut scores: BinaryHeap<(usize, u8)> = BinaryHeap::new();
+        let chunk: Vec<u8> = data.iter()
+                                .skip(i)    //control starting idx
+                                .step_by(key_size)  //collect at every key_size(th) position
+                                .cloned()
+                                .collect();
+
+        for ch in 32..=126 {
+            let decrypted = xor_one_byte(&chunk, ch);
+            let score = score_text(&decrypted);
+            scores.push((score as usize, ch));
+        }
+        // returns the highest element in the heap
+        key.push(scores.pop().unwrap().1);
+    }
+
+    key
 }
