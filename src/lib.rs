@@ -112,6 +112,45 @@ pub fn base64_encode(data: &[u8]) -> String {
     encoded_string
 }
 
+pub fn base64_decode(data: &str) -> Result<Vec<u8>, (&str, u8)> {
+    let mut collected_bits = 0;
+    let mut byte_buffer = 0u16;
+    let mut databytes = data.bytes();
+    let mut outputbytes = Vec::<u8>::new();
+
+    'decodeloop: loop {
+        while collected_bits < 8 {
+            if let Some(nextbyte) = databytes.next() {
+                // Finds the first occurrence of the latest byte
+                if let Some(idx) = CHARSET.iter().position(|&x| x == nextbyte) {
+                    byte_buffer |= ((idx & 0b00111111) as u16) << (10 - collected_bits);
+                    collected_bits += 6;
+                } else if nextbyte == (PADDING as u8) {
+                    collected_bits -= 2; // Padding only comes at the end so this works
+                } else {
+                    return Err((
+                        "Failed to decode base64: Expected byte from charset, found invalid byte.",
+                        nextbyte,
+                    ));
+                }
+            } else {
+                break 'decodeloop;
+            }
+        }
+        outputbytes.push(((0b1111111100000000 & byte_buffer) >> 8) as u8);
+        byte_buffer &= 0b0000000011111111;
+        byte_buffer <<= 8;
+        collected_bits -= 8;
+    }
+
+    if collected_bits != 0 {
+        return Err(("Failed to decode base64: Invalid padding.", collected_bits));
+    }
+
+    Ok(outputbytes)
+}
+
+
 /// Converts a slice of bytes (`&[u8]`) into a hexadecimal string.
 ///
 /// This function takes a byte slice and converts each byte into a
@@ -419,8 +458,8 @@ pub fn print_type<T>(_: &T) {
 /// let distance = hamming_distance_bit(s1, s2);
 /// println!("Bit-level Hamming distance: {}", distance); // Outputs: 4
 /// ```
-pub fn hamming_distance_bit(s1: &str, s2: &str) -> u32 {
-    s1.bytes().zip(s2.bytes())
+pub fn hamming_distance_bit(s1: &[u8], s2: &[u8]) -> u32 {
+    s1.iter().zip(s2.iter())
         .map(|(b1, b2)| (b1 ^ b2).count_ones()).sum()
 }
 
