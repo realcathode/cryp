@@ -492,6 +492,27 @@ pub fn hamming_distance_char(s1: &str, s2: &str) -> usize {
         .filter(|(c1, c2)| c1 != c2).count() as usize
 }
 
+/// Guesses the most likely key size used in a repeating-key XOR cipher by calculating
+/// the average normalized Hamming distance for different key sizes.
+///
+/// The function compares chunks of ciphertext for different key sizes and returns
+/// the key size with the smallest normalized average Hamming distance, which is
+/// assumed to be the most likely key size.
+///
+/// # Arguments
+/// - `data`: The ciphertext encrypted with a repeating-key XOR cipher.
+/// - `min_guess`: The minimum possible key size to consider.
+/// - `max_guess`: The maximum possible key size to consider.
+///
+/// # Returns
+/// - The most likely key size (usize) based on the average normalized Hamming distance.
+///
+/// # Example
+/// ```rust
+/// let data = vec![/* some ciphertext bytes */];
+/// let guessed_key_size = xor_guess_key_len(&data, 2, 40);
+/// println!("Guessed key size: {}", guessed_key_size);
+/// ```
 pub fn xor_guess_key_len(data: &[u8], min_guess: usize, max_guess: usize) -> usize {
     let mut scores: Vec<(f64, usize)> = Vec::new();
 
@@ -518,6 +539,23 @@ pub fn xor_guess_key_len(data: &[u8], min_guess: usize, max_guess: usize) -> usi
     scores[0].1
 }
 
+/// Guesses the key used for a repeating-key XOR cipher, given a guessed key size.
+/// It tries each possible (printable) byte (from 32 to 126) for each key position and scores the results based on how likely they are to be plaintext.
+///
+/// # Arguments
+/// - `data`: The ciphertext encrypted with a repeating-key XOR cipher.
+/// - `key_size`: The guessed key size (should be obtained from `xor_guess_key_len`).
+///
+/// # Returns
+/// - A vector containing the guessed key (as bytes).
+///
+/// # Example
+/// ```rust
+/// let data = vec![/* some ciphertext bytes */];
+/// let key_size = 5;
+/// let guessed_key = xor_guess_key(&data, key_size);
+/// println!("Guessed key: {:?}", guessed_key);
+/// ```
 pub fn xor_guess_key(data: &[u8], key_size: usize) -> Vec<u8> {
     let mut key = Vec::new();
 
