@@ -1,4 +1,4 @@
-use cryp::{character_frequency};
+use cryp::character_frequency;
 
 fn main() {
     let data = "Hello, world!".as_bytes();
