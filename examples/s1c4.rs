@@ -4,16 +4,15 @@ use cryp::{
     is_valid_text
 };
 use std::fs::File;
-use std::io::{self, BufReader, Read, BufRead};
+use std::io::{self, BufReader, BufRead};
 
 fn main() -> io::Result<()> {
     let filename = "/path/to/4.txt";
     let file = File::open(filename)?;
-    let mut reader = BufReader::new(file);
+    let reader = BufReader::new(file);
 
     for line in reader.lines() {
         let line = line?; 
-        let mut score = 0.0;
         for i in 0..255 {
             let bytes_line = hexstr_to_bytes(&line).unwrap();
             let xored = xor_one_byte(&bytes_line, i);

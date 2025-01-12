@@ -1,7 +1,7 @@
 use std::fs;
-use cryp::{ xor_one_byte, xor_repeating, xor_guess_key,
-            xor_guess_key_len, hamming_distance_bit, 
-            base64_decode, score_text
+use cryp::{ xor_repeating, xor_guess_key,
+            xor_guess_key_len, 
+            base64_decode,
         };
 
 fn main() {
