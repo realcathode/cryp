@@ -578,3 +578,15 @@ pub fn xor_guess_key(data: &[u8], key_size: usize) -> Vec<u8> {
 
     key
 }
+
+pub fn pkcs7_padding(block: &[u8], len: usize) -> Option<Vec<u8>> {
+    if len < block.len() {
+        return None;
+    }
+    let mut padded_vec: Vec<u8> = block.to_vec();
+    
+    for _ in 0..len - block.len() {
+        padded_vec.push(0);
+    }
+    Some(padded_vec)
+}
