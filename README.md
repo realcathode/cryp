@@ -25,6 +25,7 @@ fn main() {
     println!("{}", String::from_utf8_lossy(&decoded));
 }
 ```
+Set 1
 - [x] Convert hex to base64
 - [x] Fixed XOR
 - [x] Single-byte XOR cipher
@@ -34,7 +35,8 @@ fn main() {
 - [x] AES in ECB mode
 - [x] Detect AES in ECB mode
 
-- [ ] Implement PKCS#7 padding
+Set 2
+- [x] Implement PKCS#7 padding
 - [ ] Implement CBC mode
 - [ ] An ECB/CBC detection oracle
 - [ ] Byte-at-a-time ECB decryption (Simple)
