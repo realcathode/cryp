@@ -3,7 +3,7 @@ use std::fmt::Write;
 use std::collections::HashMap;
 use std::cmp::Ordering;
 use std::collections::BinaryHeap;
-
+use openssl::symm::{Cipher, Mode, Crypter};
 
 const CHARSET: &[u8; 64] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 const PADDING: char = '=';
@@ -586,7 +586,55 @@ pub fn pkcs7_padding(block: &[u8], len: usize) -> Option<Vec<u8>> {
     let mut padded_vec: Vec<u8> = block.to_vec();
     
     for _ in 0..len - block.len() {
-        padded_vec.push(0);
+        padded_vec.push(0x00);
     }
     Some(padded_vec)
+}
+
+fn aes(block: &[u8], key: &[u8], cipher: Cipher, mode: Mode) -> Vec<u8> {
+    assert_eq!(block.len() % 16, 0);
+    let mut encrypter = Crypter::new(cipher, mode, key, None).unwrap();
+    encrypter.pad(false);
+    let mut out = vec![0;block.len()+16];
+    encrypter.update(&block, &mut out).unwrap();
+    out.truncate(block.len());
+    out
+  }
+  
+pub fn aes_ecb_decrypt(block: &[u8], key: &[u8]) -> Vec<u8> {
+aes(block, key, Cipher::aes_128_ecb(), Mode::Decrypt)
+}
+  
+pub fn aes_ecb_encrypt(block: &[u8], key: &[u8]) -> Vec<u8> {
+    aes(block, key, Cipher::aes_128_ecb(), Mode::Encrypt)
+}
+
+pub fn encrypt_cbc(key: &[u8], iv: &[u8], plaintext: &[u8]) -> Option<Vec<u8>> {
+    const BLOCK_SIZE: usize = 16;
+    if key.len() != BLOCK_SIZE || iv.len() != BLOCK_SIZE {
+        return None;
+    }
+
+    let padding_len = BLOCK_SIZE - (plaintext.len() % BLOCK_SIZE);
+    let mut padded_plaintext = plaintext.to_vec();
+    padded_plaintext.extend(vec![padding_len as u8; padding_len]);
+
+    let mut ciphertext = Vec::new();
+    let mut previous_block = iv.to_vec();
+
+    for chunk in padded_plaintext.chunks(BLOCK_SIZE) {
+        let mut xored_block = vec![0u8; BLOCK_SIZE];
+        xored_block.iter_mut()
+            .zip(chunk.iter())
+            .zip(previous_block.iter())
+            .for_each(|((xored_byte, &chunk_byte), &prev_byte)| {
+                *xored_byte = chunk_byte ^ prev_byte;
+            });
+
+        let encrypted_block = aes_ecb_encrypt(&xored_block, &key);
+        ciphertext.extend(&encrypted_block);
+        previous_block = encrypted_block;
+    }
+
+    Some(ciphertext)
 }
